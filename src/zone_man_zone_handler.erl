@@ -8,7 +8,6 @@ init(Req, Opts) ->
 	{cowboy_rest, Req, Opts}.
 
 content_types_provided(Req, State) ->
-    io:format("Req: ~p", [Req]),
 	{[
 		{<<"application/json">>, zones},
         {'*', hello_to_json}
