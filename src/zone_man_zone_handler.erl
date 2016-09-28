@@ -15,7 +15,7 @@ content_types_provided(Req, State) ->
 	], Req, State}.
 
 zones(Req, State) ->
-    Zones = zone_man_cmd:run("/usr/sbin/zoneadm", ["lists", "-v"]),
+    Zones = zone_man_cmd:run("/usr/sbin/zoneadm", ["list", "-v"]),
     Data = [{<<"zones">>, Zones}],
     Body = jsx:encode(Data),
     {Body, Req, State}.
