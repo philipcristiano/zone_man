@@ -1,5 +1,7 @@
 # Zone Manager
 
+[![Build Status](https://travis-ci.org/philipcristiano/zone_man.svg)](https://travis-ci.org/philipcristiano/zone_man)
+
 Manage Solaris zones via an HTTP API.
 
 
