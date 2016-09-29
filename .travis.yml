@@ -1,0 +1,6 @@
+language: erlang
+
+before_script:
+    kerl list installations
+
+script: make deps app test
