@@ -1,6 +1,6 @@
 language: erlang
 
-otp_releases:
+otp_release:
   - 19.1
   - 18.3
 
