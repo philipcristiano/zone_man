@@ -1,7 +1,32 @@
 -module(zone_man_cmd).
 
--export([run/2]).
+-export([run/2,
+         list_zones/0,
+         parse_machine_zone/1]).
 
+list_zones() ->
+    MachineZones = zone_man_cmd:run("/usr/sbin/zoneadm", ["list", "-p"]),
+    Zones = parse_machine_zones(MachineZones),
+    Zones.
+
+parse_machine_zones(MachineZones) ->
+    parse_machine_zones(MachineZones, []).
+
+parse_machine_zones([], Zones) ->
+    Zones;
+parse_machine_zones([H|T], Zones) ->
+    Zone = parse_machine_zone(H),
+    parse_machine_zones(T, [Zone|Zones]).
+
+parse_machine_zone(MZ) ->
+    [ID, Name, Status, Path, UUID, Brand, IPType] = re:split(MZ, ":"),
+    [{id, ID},
+     {name, Name},
+     {status, Status},
+     {path, Path},
+     {uuid, UUID},
+     {brand, Brand},
+     {iptype, IPType}].
 
 
 run(CMD, Options) ->
