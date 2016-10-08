@@ -9,9 +9,14 @@ Manage Solaris zones via an HTTP API.
 
 Requires gnu-make and erlang, tested with @19.
 ```
-PATH=/opt/omni/bin/:$PATH /usr/gnu/bin/make deps app
+PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make deps app
 ```
 
+## Publishing the IPS package
+
+```
+PKGSRVR=YOUR_IPS_REPO PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make package publish
+```
 
 # API
 
