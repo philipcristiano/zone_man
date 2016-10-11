@@ -4,7 +4,6 @@
 
 Manage Solaris zones via an HTTP API.
 
-
 ## Building (on OmniOS)
 
 Requires gnu-make and erlang, tested with @19.
@@ -21,18 +20,7 @@ PKGSRVR=YOUR_IPS_REPO PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make package publis
 # API
 
 
-## Listing Zones
+Full API Docs are available via Swagger at the path `/api-docs/`.
 
-Zones on a machine can be listed with the `/v1/zones` endpoint.
-
-```
-% curl http://API/v1/zones
-{"zones":[{"id":"2",
-           "name":"dev",
-           "status":"running",
-           "path":"/",
-           "uuid":"4872c422-3ad9-4b99-8b9a-a416f282b866",
-           "brand":"native",
-           "iptype":"excl"}]}
-%
-```
+At the moment only listing zones is supported. Creating zones is the next
+feature.
