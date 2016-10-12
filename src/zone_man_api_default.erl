@@ -19,10 +19,11 @@ rest_init(Req, _Opts) ->
   {ok, Req, #{}}.
 
 content_types_accepted(Req, State) ->
-  {[{<<"application/json">>, handle_put}], Req, State}.
+    io:format("state ~p~n", [State]),
+    {[{<<"application/json">>, validate_post}], Req, State}.
 
 content_types_provided(Req, State) ->
-  {[{<<"application/json">>, handle_get}], Req, State}.
+    {[{<<"application/json">>, handle_get}], Req, State}.
 
 forbidden(Req, State) ->
   {false, Req, State}.

@@ -23,6 +23,9 @@ start(_Type, _Args) ->
     ],
     {ok, _} =
         cowboy:start_http(example_http, ListenerCount, RanchOptions, CowboyOptions),
+    %     cowboy:start_clear(http, 100, [{port, 8080}], #{
+    %         env => #{dispatch => Dispatch}
+    %     }),
 
 	zone_man_sup:start_link().
 
