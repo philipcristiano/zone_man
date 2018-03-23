@@ -5,13 +5,13 @@
 -export([zones/2]).
 
 init(Req, Opts) ->
-	{cowboy_rest, Req, Opts}.
+  {cowboy_rest, Req, Opts}.
 
 content_types_provided(Req, State) ->
-	{[
-		{<<"application/json">>, zones},
+  {[
+    {<<"application/json">>, zones},
         {'*', hello_to_json}
-	], Req, State}.
+  ], Req, State}.
 
 zones(Req, State) ->
     Zones = zone_man_cmd:list_zones(),

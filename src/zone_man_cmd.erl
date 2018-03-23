@@ -1,4 +1,5 @@
 -module(zone_man_cmd).
+-compile({parse_transform, lager_transform}).
 
 -export([run/2,
          list_zones/0,
@@ -42,6 +43,6 @@ do_read(Port, Output) ->
         {Port, eof} ->
             lists:reverse(Output);
         Any ->
-            io:format("No match fifo_client:do_read/1, ~p~n",[Any]),
+            lager:info("No match fifo_client:do_read/1, ~p", [Any]),
             do_read(Port, Output)
   end.
