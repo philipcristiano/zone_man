@@ -15,7 +15,7 @@ stages:
     steps:
       - env
       - pwd
-      - make deps app static
+      - make deps app
       - make tests
       - make elvis
       # - make dialyze
