@@ -3,7 +3,8 @@ PROJECT_DESCRIPTION = New project
 PROJECT_VERSION = 0.0.1
 # PROJECT_VERSION = $(shell git describe --tags --abbrev=0)
 
-DEPS = cowboy jsx elvis
+BUILD_DEPS = elvis_mk
+DEPS = cowboy jsx
 dep_cowboy = git https://github.com/ninenines/cowboy.git e80291f
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.8.0
 dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
