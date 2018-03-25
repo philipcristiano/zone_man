@@ -10,8 +10,14 @@ start(_Type, _Args) ->
       {"/v1/zones", zone_man_zone_handler, []}
     ]}
   ]),
-  cowboy:start_clear(http, 100, [{port, 8080}], #{
+  cowboy:start_clear(http, [{port, 8080}], #{
     env => #{dispatch => Dispatch}
+  }),
+  cowboy:start_tls(https, [{port, 8443},
+                           {cacertfile, "certs/ca.pem"},
+		                       {certfile, "certs/server.pem"},
+                           {keyfile, "certs/server-key.pem"}],
+                  #{env => #{dispatch => Dispatch}
   }),
 
   zone_man_sup:start_link().

@@ -1,0 +1,18 @@
+{
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "hosts": ["localhost"],
+    "usage": ["server-auth"],
+    "CN": "localhost",
+    "names": [
+        {
+            "C":  "US",
+            "L":  "Philadelphia",
+            "O":  "Zone Man",
+            "OU": "WWW",
+            "ST": "Pennsylvania"
+        }
+    ]
+}

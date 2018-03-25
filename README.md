@@ -12,6 +12,10 @@ Requires gnu-make and erlang, tested with @19.
 PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make deps app
 ```
 
+### Generating certs
+
+The `certs` directory contains example cfssl files. For development running `make certs` will generate enough to work with.
+
 ## Publishing the IPS package
 
 ```

@@ -5,8 +5,8 @@ PROJECT_VERSION = 0.0.1
 
 BUILD_DEPS = elvis_mk
 DEPS = cowboy jsx lager
-dep_cowboy = git https://github.com/ninenines/cowboy.git e80291f
-dep_jsx = git https://github.com/talentdeficit/jsx.git v2.8.0
+dep_cowboy_commit = 2.2.2
+dep_jsx = git https://github.com/talentdeficit/jsx.git v2.9.0
 dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
 
@@ -25,33 +25,18 @@ export IPS_SUMMARAY=${IPS_DESCRIPTION}
 #PKG_VERSION	?= $(shell git describe --tags | tr - .)
 ARCH=$(shell uname -p)
 
-define IPS_METADATA
-set name=pkg.fmri value=${IPS_FMRI}
-set name=pkg.description value="${IPS_DESCRIPTION}"
-set name=pkg.summary value="${IPS_SUMMARAY}"
-set name=variant.arch value=${ARCH}
-endef
-export IPS_METADATA
+certs/ca.pem:
+	cd certs; cfssl gencert -initca ca.json | cfssljson -bare ca
 
-package:
-	rm -rf ${BUILDDIR} ${BUILDTMP}
-	mkdir -p ${BUILDDIR}/opt/ ${BUILDTMP}
-	cp -R _rel/zone_man_release ${BUILDDIR}/opt/zone_man
+certs/server.pem:
+	cd certs; cfssl gencert -ca ca.pem -ca-key ca-key.pem server.json | cfssljson -bare server
 
-	# SMF
-	mkdir -p ${BUILDDIR}/lib/svc/manifest/application/
-	cp smf.xml ${BUILDDIR}/lib/svc/manifest/application/zone-man.xml
-
-	pkgsend generate build | pkgfmt > ${BUILDTMP}/pkg.pm5.1
-	cp LICENSE ${BUILDDIR}/
-
-	# Store metadata into a file
-	echo "$$IPS_METADATA" > ${BUILDTMP}/pkg.mog
-
-	pkgmogrify ${BUILDTMP}/pkg.pm5.1 ${BUILDTMP}/pkg.mog transform.mog | pkgfmt > ${BUILDTMP}/pkg.pm5.final
+certs/client.pem:
+	cd certs; cfssl gencert -ca ca.pem -ca-key ca-key.pem client.json | cfssljson -bare client
 
 
-	pkglint ${BUILDTMP}/pkg.pm5.final
+.PHONY: certs
+certs: certs/ca.pem certs/server.pem certs/client.pem
 
 package: ips-prototype
 	mkdir -p ${IPS_BUILD_DIR}/var/lib/zone_man
