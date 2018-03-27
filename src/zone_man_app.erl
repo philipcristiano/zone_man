@@ -16,7 +16,9 @@ start(_Type, _Args) ->
   cowboy:start_tls(https, [{port, 8443},
                            {cacertfile, "certs/ca.pem"},
 		                       {certfile, "certs/server.pem"},
-                           {keyfile, "certs/server-key.pem"}],
+                           {keyfile, "certs/server-key.pem"},
+                           {fail_if_no_peer_cert, true},
+                           {verify, verify_peer}],
                   #{env => #{dispatch => Dispatch}
   }),
 
