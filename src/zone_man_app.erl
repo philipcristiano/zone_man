@@ -23,7 +23,7 @@ start(_Type, _Args) ->
 
   cowboy:start_tls(https, [{port, 8443},
                            {cacertfile, CACertFile},
-		                       {certfile, CertFile},
+                           {certfile, CertFile},
                            {keyfile, KeyFile},
                            {fail_if_no_peer_cert, true},
                            {verify, verify_peer}],
