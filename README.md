@@ -12,10 +12,24 @@ Requires gnu-make and erlang, tested with @19.
 PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make deps app
 ```
 
+### Generating certs
+
+The `certs` directory contains example cfssl files. For development running `make certs` will generate enough to work with.
+
 ## Publishing the IPS package
 
 ```
 PKGSRVR=YOUR_IPS_REPO PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make package publish
+```
+
+## Configuration
+
+`cerificates_directory` - Directory where the `ca.pem`, `server.pem`, and `server-key.pem` reside. Development defaults to `certs`.
+
+Example:
+
+```
+[{zone_man, [{certificates_directory, "/var/lib/zone_man/certificates"}]}].
 ```
 
 # API

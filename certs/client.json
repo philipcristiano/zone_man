@@ -1,0 +1,16 @@
+{
+    "CN": "client",
+    "key": {
+        "algo": "rsa",
+        "size": 2048
+    },
+    "names": [
+        {
+            "C":  "US",
+            "L":  "Philadelphia",
+            "O":  "Zone Man",
+            "OU": "WWW",
+            "ST": "Pennsylvania"
+        }
+    ]
+}

@@ -11,3 +11,6 @@ rel/example_project
 /_rel/
 relx
 /.erlang.mk/
+elvis
+/certs
+/log
