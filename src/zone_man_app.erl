@@ -10,9 +10,6 @@ start(_Type, _Args) ->
       {"/v1/zones", zone_man_zone_handler, []}
     ]}
   ]),
-  cowboy:start_clear(http, [{port, 8080}], #{
-    env => #{dispatch => Dispatch}
-  }),
 
   CertsDir = case application:get_env(zone_man,
                                       certificates_directory,
@@ -23,6 +20,7 @@ start(_Type, _Args) ->
   CACertFile = CertsDir ++ "/ca.pem",
   CertFile = CertsDir ++ "/server.pem",
   KeyFile = CertsDir ++ "/server-key.pem",
+
   cowboy:start_tls(https, [{port, 8443},
                            {cacertfile, CACertFile},
 		                       {certfile, CertFile},
