@@ -13,10 +13,20 @@ start(_Type, _Args) ->
   cowboy:start_clear(http, [{port, 8080}], #{
     env => #{dispatch => Dispatch}
   }),
+
+  CertsDir = case application:get_env(zone_man,
+                                      certificates_directory,
+                                      undefined) of
+      undefined -> "certs";
+      Val -> Val
+  end,
+  CACertFile = CertsDir ++ "/ca.pem",
+  CertFile = CertsDir ++ "/server.pem",
+  KeyFile = CertsDir ++ "/server-key.pem",
   cowboy:start_tls(https, [{port, 8443},
-                           {cacertfile, "certs/ca.pem"},
-		                       {certfile, "certs/server.pem"},
-                           {keyfile, "certs/server-key.pem"},
+                           {cacertfile, CACertFile},
+		                       {certfile, CertFile},
+                           {keyfile, KeyFile},
                            {fail_if_no_peer_cert, true},
                            {verify, verify_peer}],
                   #{env => #{dispatch => Dispatch}
