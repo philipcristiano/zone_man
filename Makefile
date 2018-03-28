@@ -28,15 +28,21 @@ ARCH=$(shell uname -p)
 certs/ca.pem:
 	cd certs; cfssl gencert -initca ca.json | cfssljson -bare ca
 
+certs/invalid-ca.pem:
+	cd certs; cfssl gencert -initca ca.json | cfssljson -bare invalid-ca
+
 certs/server.pem:
 	cd certs; cfssl gencert -ca ca.pem -ca-key ca-key.pem server.json | cfssljson -bare server
 
 certs/client.pem:
 	cd certs; cfssl gencert -ca ca.pem -ca-key ca-key.pem client.json | cfssljson -bare client
 
+certs/invalid-client.pem:
+	cd certs; cfssl gencert -ca invalid-ca.pem -ca-key invalid-ca-key.pem client.json | cfssljson -bare invalid-client
+
 
 .PHONY: certs
-certs: certs/ca.pem certs/server.pem certs/client.pem
+certs: certs/ca.pem certs/server.pem certs/client.pem certs/invalid-ca.pem certs/invalid-client.pem
 
 package: ips-prototype
 	mkdir -p ${IPS_BUILD_DIR}/var/lib/zone_man
