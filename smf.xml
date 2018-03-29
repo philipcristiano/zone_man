@@ -2,9 +2,9 @@
 <!DOCTYPE service_bundle SYSTEM "/usr/share/lib/xml/dtd/service_bundle.dtd.1">
 <!--
         Created by Manifold
---><service_bundle type="manifest" name="builderl">
+--><service_bundle type="manifest" name="zone_man">
 
-    <service name="application/builderl" type="service" version="6">
+    <service name="application/zone_man" type="service" version="6">
         <create_default_instance enabled="false"/>
 
         <single_instance/>
@@ -26,13 +26,13 @@
 
 
         <method_context>
-            <method_credential user='builderl' group='builderl' privileges='basic,PRIV_NET_PRIVADDR'/>
+            <method_credential user='zone_man' group='zone_man' privileges='basic,PRIV_NET_PRIVADDR'/>
             <method_environment>
-                <envvar name="HOME" value="/opt/builderl"/>
+                <envvar name="HOME" value="/opt/zone_man"/>
             </method_environment>
         </method_context>
 
-        <exec_method type="method" name="start" exec="/opt/builderl/bin/builderl_release start" timeout_seconds="60"/>
+        <exec_method type="method" name="start" exec="/opt/zone_man/bin/zone_man_release start" timeout_seconds="60"/>
         <exec_method type="method" name="stop" exec=":kill" timeout_seconds="60"/>
 
         <property_group name="startd" type="framework">
