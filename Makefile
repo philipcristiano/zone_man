@@ -56,6 +56,8 @@ package: ips-prototype
 	cp omnios.config "${IPS_BUILD_DIR}/etc/${PROJECT}.config"
 	$(call add-ips-transform, "<transform file path=etc/zone_man.config -> add preserve true>")
 
+	mkdir -p ${IPS_BUILD_DIR}/var/lib/zone_man/certificates
+
 publish: ips-package
 ifndef PKGSRVR
 	echo "Need to define PKGSRVR, something like http://localhost:10000"
