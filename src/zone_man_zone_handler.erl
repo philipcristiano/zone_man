@@ -14,7 +14,7 @@ content_types_provided(Req, State) ->
   ], Req, State}.
 
 zones(Req, State) ->
-    Zones = zone_man_cmd:list_zones(),
+    {ok, Zones} = zone_man_master:list(),
     Data = [{<<"zones">>, Zones}],
     Body = jsx:encode(Data),
     {Body, Req, State}.
