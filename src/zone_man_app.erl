@@ -26,6 +26,7 @@ start(_Type, _Args) ->
                            {certfile, CertFile},
                            {keyfile, KeyFile},
                            {fail_if_no_peer_cert, true},
+                           {server_name_indication, disable},
                            {verify, verify_peer}],
                   #{env => #{dispatch => Dispatch}
   }),
