@@ -21,7 +21,8 @@
          terminate/2,
          code_change/3]).
 
--export([list/0]).
+-export([list/0,
+         stop/0]).
 
 -record(state, {}).
 
@@ -31,6 +32,9 @@
 
 list() ->
     gen_server:call(?MODULE, {list}).
+
+stop() ->
+    gen_server:call(?MODULE, {stop}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -77,6 +81,8 @@ init([]) ->
 handle_call({list}, _From, State) ->
     Zones = zone_man_cmd:list_zones(),
     {reply, {ok, Zones}, State};
+handle_call({stop}, _From, State) ->
+    {stop, normal, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.

@@ -4,11 +4,14 @@ PROJECT_VERSION = 0.0.1
 # PROJECT_VERSION = $(shell git describe --tags --abbrev=0)
 
 BUILD_DEPS = elvis_mk
+TEST_DEPS = meck
 DEPS = cowboy jsx lager
+
 dep_cowboy_commit = 2.2.2
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.9.0
 dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
+dep_meck = git https://github.com/eproxus/meck.git 0.8.4
 
 DEP_PLUGINS = cowboy elvis_mk
 
