@@ -20,14 +20,26 @@ parse_machine_zones([H|T], Zones) ->
     parse_machine_zones(T, [Zone|Zones]).
 
 parse_machine_zone(MZ) ->
-    [ID, Name, Status, Path, UUID, Brand, IPType] = re:split(MZ, ":"),
-    [{id, ID},
-     {name, Name},
-     {status, Status},
-     {path, Path},
-     {uuid, UUID},
-     {brand, Brand},
-     {iptype, IPType}].
+    case re:split(MZ, ":") of
+        [ID, Name, Status, Path, UUID, Brand, IPType] ->
+            [{id, ID},
+             {name, Name},
+             {status, Status},
+             {path, Path},
+             {uuid, UUID},
+             {brand, Brand},
+             {iptype, IPType}];
+        [ID, Name, Status, Path, UUID, Brand, IPType, DebugID] ->
+            [{id, ID},
+             {name, Name},
+             {status, Status},
+             {path, Path},
+             {uuid, UUID},
+             {brand, Brand},
+             {iptype, IPType},
+             {debugid, DebugID}]
+    end.
+
 
 
 run(CMD, Options) ->
