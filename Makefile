@@ -6,6 +6,7 @@ PROJECT_VERSION = 0.0.1
 BUILD_DEPS = elvis_mk
 TEST_DEPS = meck
 DEPS = cowboy jsx lager
+LOCAL_DEPS = sasl
 
 dep_cowboy_commit = 2.5.0
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.9.0
