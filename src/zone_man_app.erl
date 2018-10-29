@@ -21,6 +21,10 @@ start(_Type, _Args) ->
   CertFile = CertsDir ++ "/server.pem",
   KeyFile = CertsDir ++ "/server-key.pem",
 
+  true = filelib:is_regular(CACertFile),
+  true = filelib:is_regular(CertFile),
+  true = filelib:is_regular(KeyFile),
+
   cowboy:start_tls(https, [{port, 8443},
                            {cacertfile, CACertFile},
                            {certfile, CertFile},
