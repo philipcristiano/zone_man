@@ -1,5 +1,6 @@
 -module(zone_man_app).
 -behaviour(application).
+-compile([{parse_transform, lager_transform}]).
 
 -export([start/2]).
 -export([stop/1]).
@@ -21,8 +22,11 @@ start(_Type, _Args) ->
   CertFile = CertsDir ++ "/server.pem",
   KeyFile = CertsDir ++ "/server-key.pem",
 
+  lager:info("Checking for file ~p", [CACertFile]),
   true = filelib:is_regular(CACertFile),
+  lager:info("Checking for file ~p", [CertFile]),
   true = filelib:is_regular(CertFile),
+  lager:info("Checking for file ~p", [KeyFile]),
   true = filelib:is_regular(KeyFile),
 
   cowboy:start_tls(https, [{port, 8443},
