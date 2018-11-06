@@ -9,8 +9,7 @@ init(Req, Opts) ->
 zones(Req, State) ->
     {ok, Zones} = zone_man_master:list(),
     Data = [{<<"zones">>, Zones}],
-    Body = jsx:encode(Data),
-    {Body, Req, State}.
+    {Data, Req, State}.
 
 get(Req, State) ->
     zones(Req, State).
