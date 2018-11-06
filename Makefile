@@ -1,7 +1,6 @@
 PROJECT = zone_man
-PROJECT_DESCRIPTION = New project
+PROJECT_DESCRIPTION = illumos Zone Manager HTTP API
 PROJECT_VERSION = 0.0.1
-# PROJECT_VERSION = $(shell git describe --tags --abbrev=0)
 
 BUILD_DEPS = elvis_mk
 TEST_DEPS = meck
