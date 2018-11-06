@@ -1,5 +1,7 @@
 -module(zone_man_zone_handler).
 
+-behaviour(zm_api).
+
 -export([init/2]).
 -export([zones/2, get/2]).
 

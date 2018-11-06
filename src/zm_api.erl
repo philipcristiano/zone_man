@@ -4,6 +4,8 @@
 -export([upgrade/4]).
 
 
+-callback get(any(), any()) -> {any(), any(), any()}.
+
 upgrade(Req, Env, Handler, HandlerState) ->
   lager:info("Handler ~p", [Handler]),
   call(Req, Env, Handler, HandlerState).
@@ -17,5 +19,3 @@ call(Req, Env, Handler, HandlerState) ->
   Req4 = cowboy_req:reply(200, Req3),
   Result = cowboy_handler:terminate(normal, Req4, HS2, Handler),
   {ok, Req3, Result}.
-
-
