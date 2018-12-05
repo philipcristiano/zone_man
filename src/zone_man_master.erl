@@ -22,7 +22,8 @@
          code_change/3]).
 
 -export([list/0,
-         stop/0]).
+         stop/0,
+         create/1]).
 
 -record(state, {}).
 
@@ -35,6 +36,9 @@ list() ->
 
 stop() ->
     gen_server:call(?MODULE, {stop}).
+
+create(Name) ->
+    gen_server:call(?MODULE, {create, Name}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -83,6 +87,10 @@ handle_call({list}, _From, State) ->
     {reply, {ok, Zones}, State};
 handle_call({stop}, _From, State) ->
     {stop, normal, State};
+handle_call({create, Name}, _From, State) ->
+    Spec = #{name => Name},
+    {ok, _Child} = zone_man_manager_sup:start(Spec),
+    {reply, {ok}, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.

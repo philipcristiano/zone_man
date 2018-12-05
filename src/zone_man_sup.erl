@@ -8,7 +8,11 @@ start_link() ->
   supervisor:start_link({local, ?MODULE}, ?MODULE, []).
 
 init([]) ->
-  Procs = [#{id    => zone_man_master,
+  Procs = [#{id    => zone_man_manager_sup,
+             start => {zone_man_manager_sup, start_link, []},
+             type  => supervisor
+           },
+           #{id    => zone_man_master,
              start => {zone_man_master, start_link, []}
            }],
   {ok, {{one_for_one, 1, 5}, Procs}}.

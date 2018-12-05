@@ -24,4 +24,6 @@ post_spec() ->
 
 post(Req, State, Data) ->
     lager:info("Data ~p", [Data]),
+    Name = maps:get(<<"name">>, Data),
+    zone_man_master:create(Name),
     {Data, Req, State}.

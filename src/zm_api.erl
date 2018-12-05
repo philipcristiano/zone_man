@@ -41,8 +41,9 @@ validate_spec_to_data(Spec, Data, _Errors) when is_map(Spec) ->
   validate_spec_to_data(SpecL, Data, #{});
 validate_spec_to_data(Spec=[], _Data, _Errors) when is_list(Spec) ->
   {#{}, []};
-validate_spec_to_data(Spec=[{H, SingleSpec}| T], Data, Errors) when is_list(Spec) ->
-  lager:info("~p ~p", [H, SingleSpec]),
+validate_spec_to_data(
+    Spec=[{H, SingleSpec}| T], Data, Errors) when is_list(Spec) ->
+  lager:info("validating ~p ~p", [H, SingleSpec]),
   {OurData, OurErrors} = case maps:is_key(H, Data) of
     true -> Val = maps:get(H, Data),
             {#{H => Val}, []};
