@@ -11,7 +11,7 @@ dep_cowboy_commit = 2.5.0
 dep_jsx = git https://github.com/talentdeficit/jsx.git v2.9.0
 dep_elvis_mk = git https://github.com/inaka/elvis.mk.git 1.0.0
 dep_lager = git https://github.com/erlang-lager/lager.git 3.4.1
-dep_meck = git https://github.com/eproxus/meck.git 0.8.4
+dep_meck = git https://github.com/eproxus/meck.git 0.8.12
 
 DEP_PLUGINS = cowboy elvis_mk
 
