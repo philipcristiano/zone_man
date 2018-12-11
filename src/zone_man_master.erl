@@ -7,11 +7,12 @@
 %%%-------------------------------------------------------------------
 
 -module(zone_man_master).
+-compile({parse_transform, lager_transform}).
 
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -27,6 +28,9 @@
 
 -record(state, {}).
 
+-define(TABLE, zone_registry).
+-record(zone_record, {name, spec, desired_state}).
+
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -37,7 +41,7 @@ list() ->
 stop() ->
     gen_server:call(?MODULE, {stop}).
 
-create(Name) ->
+create(Name) when is_binary(Name) ->
     gen_server:call(?MODULE, {create, Name}).
 
 %%--------------------------------------------------------------------
@@ -47,8 +51,8 @@ create(Name) ->
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+start_link(FileBase) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -65,7 +69,13 @@ start_link() ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([]) ->
+init([FileBase]) ->
+    Filename = filename:join([FileBase, "dets", "zone_registry"]),
+    ok = lager:info("Zone registry file ~p", [Filename]),
+    ok = filelib:ensure_dir(Filename),
+    {ok, _Name} = dets:open_file(?TABLE, [{type, set},
+                                          {keypos, #zone_record.name},
+                                          {file, Filename}]),
     {ok, #state{}}.
 
 %%--------------------------------------------------------------------
@@ -83,12 +93,15 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_call({list}, _From, State) ->
-    Zones = zone_man_cmd:list_zones(),
+    % Zones = zone_man_cmd:list_zones(),
+    Zones = all_zone_names(),
     {reply, {ok, Zones}, State};
 handle_call({stop}, _From, State) ->
     {stop, normal, State};
 handle_call({create, Name}, _From, State) ->
     Spec = #{name => Name},
+    Record =  #zone_record{name = Name, spec=#{}, desired_state=running},
+    ok = dets:insert(?TABLE, Record),
     {ok, _Child} = zone_man_manager_sup:start(Spec),
     {reply, {ok}, State};
 handle_call(_Request, _From, State) ->
@@ -149,3 +162,15 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+
+all_zone_names() ->
+    Key = dets:first(?TABLE),
+    all_zone_names(Key, []).
+
+all_zone_names('$end_of_table', L) ->
+    L;
+all_zone_names(Key, L) ->
+    lager:info("test: ~p", [Key]),
+    NewL = [Key] ++ L,
+    Next = dets:next(?TABLE, Key),
+    all_zone_names(Next, NewL).
