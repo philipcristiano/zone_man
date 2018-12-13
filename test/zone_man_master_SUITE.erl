@@ -23,9 +23,13 @@ init_per_testcase(_, Config) ->
     ok = lager_common_test_backend:bounce(debug),
     ok = meck:new(zone_man_cmd, []),
     ok = meck:new(zone_man_manager_sup, [unstick]),
+    Pid = start_mut(Config),
+    [{pid, Pid}|Config].
+
+start_mut(Config) ->
     PrivDir = ?config(priv_dir, Config),
     {ok, Pid} = ?MUT:start_link(PrivDir),
-    [{pid, Pid}|Config].
+    Pid.
 
 end_per_testcase(_, Config) ->
     true = meck:validate(zone_man_cmd),
@@ -33,8 +37,7 @@ end_per_testcase(_, Config) ->
 
     ok = meck:unload(zone_man_cmd),
     ok = meck:unload(zone_man_manager_sup),
-    Pid = ?config(pid, Config),
-    ok = ?MUT:stop(Pid),
+    ?MUT:stop(),
     Config.
 
 aa_list_with_no_zones(_Config) ->
