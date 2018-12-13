@@ -39,7 +39,7 @@ list() ->
     gen_server:call(?MODULE, {list}).
 
 stop() ->
-    gen_server:call(?MODULE, {stop}).
+    gen_server:stop(?MODULE).
 
 create(Name) when is_binary(Name) ->
     gen_server:call(?MODULE, {create, Name}).
@@ -76,6 +76,7 @@ init([FileBase]) ->
     {ok, _Name} = dets:open_file(?TABLE, [{type, set},
                                           {keypos, #zone_record.name},
                                           {file, Filename}]),
+    ok = gen_server:cast(?MODULE, {start_all}),
     {ok, #state{}}.
 
 %%--------------------------------------------------------------------
@@ -96,8 +97,6 @@ handle_call({list}, _From, State) ->
     % Zones = zone_man_cmd:list_zones(),
     Zones = all_zone_names(),
     {reply, {ok, Zones}, State};
-handle_call({stop}, _From, State) ->
-    {stop, normal, State};
 handle_call({create, Name}, _From, State) ->
     Spec = #{name => Name},
     Record =  #zone_record{name = Name, spec=#{}, desired_state=running},
@@ -118,6 +117,9 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_cast({start_all}, State) ->
+    ok = start_all(),
+    {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
@@ -174,3 +176,17 @@ all_zone_names(Key, L) ->
     NewL = [Key] ++ L,
     Next = dets:next(?TABLE, Key),
     all_zone_names(Next, NewL).
+
+start_all() ->
+    Key = dets:first(?TABLE),
+    start_all(Key).
+
+start_all('$end_of_table') ->
+    ok;
+start_all(Key) ->
+    lager:info("test: ~p", [Key]),
+    Spec = #{name => Key},
+    {ok, _Child} = zone_man_manager_sup:start(Spec),
+
+    Next = dets:next(?TABLE, Key),
+    start_all(Next).

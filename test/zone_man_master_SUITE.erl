@@ -14,7 +14,8 @@ all() -> [{group, test_init}].
 groups() -> [{test_init,
              [{create_priv_dir, auto_per_tc}],
              [aa_list_with_no_zones,
-              ba_create_zone
+              ba_create_zone,
+              bb_create_existing_zones_on_startup
             ]}].
 
 
@@ -58,3 +59,30 @@ ba_create_zone(_Config) ->
     ?assertEqual([<<"test_zone">>], NewZones),
 
     ok.
+
+bb_create_existing_zones_on_startup(Config) ->
+    TestPid = self(),
+    TestMsg = make_ref(),
+    meck:expect(zone_man_cmd, list_zones, fun() -> [] end),
+    meck:expect(zone_man_manager_sup, start, fun(_) -> TestPid ! TestMsg, {ok, child} end),
+    {ok, Zones} = zone_man_master:list(),
+    ?assertEqual([], Zones),
+
+    {ok} = zone_man_master:create(<<"test_zone">>),
+    {ok, NewZones} = zone_man_master:list(),
+    ?assertEqual([<<"test_zone">>], NewZones),
+
+    ?MUT:stop(),
+    start_mut(Config),
+
+    ok = wait_for_message(TestMsg, 100),
+    ok = wait_for_message(TestMsg, 100),
+
+    ok.
+
+wait_for_message(Msg, Timeout) ->
+    ok = receive
+      Msg -> ok
+    after
+      Timeout -> error
+    end.
