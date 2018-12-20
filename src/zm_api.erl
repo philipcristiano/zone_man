@@ -29,6 +29,7 @@ call(<<"POST">>, Req, _Env, Handler, HandlerState) ->
   Handler:post(Req, HandlerState, Data).
 
 spec_to_data(Spec, Req) ->
+  lager:debug("Spec to data ~p", [Spec]),
   Bin = read_body(Req),
   Data = jsx:decode(Bin, [return_maps]),
   validate_spec_to_data(Spec, Data).
