@@ -16,6 +16,7 @@ dep_meck = git https://github.com/eproxus/meck.git 0.8.12
 DEP_PLUGINS = cowboy elvis_mk
 
 SHELL_OPTS = -eval "application:ensure_all_started(zone_man)" # -config zone_man
+CT_OPTS ?= -create_priv_dir auto_per_tc
 
 # OmniOS build/packaging
 BUILDDIR = build
