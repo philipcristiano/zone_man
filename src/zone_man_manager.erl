@@ -89,7 +89,7 @@ handle_call(_Request, _From, State) ->
 handle_cast(go, State=#state{spec=Spec}) ->
     lager:info("Starting manager attempt to create things ~p", [Spec]),
     Name = maps:get(name, Spec),
-    VNicName = Name ++ "0",
+    VNicName = <<Name/binary, <<"0">>/binary >>,
     lager:info("Starting manager attempt to create things"),
     zone_man_netman:ensure_vnic(default, VNicName, []),
     {noreply, State}.
