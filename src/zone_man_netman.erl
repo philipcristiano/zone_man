@@ -7,6 +7,7 @@
 %%%-------------------------------------------------------------------
 
 -module(zone_man_netman).
+-compile({parse_transform, lager_transform}).
 
 -behaviour(gen_server).
 
