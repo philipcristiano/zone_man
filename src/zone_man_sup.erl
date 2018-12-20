@@ -13,10 +13,10 @@ init([]) ->
              start => {zone_man_manager_sup, start_link, []},
              type  => supervisor
            },
-           #{id    => zone_man_master,
-             start => {zone_man_master, start_link, [FileBase]}
-           },
            #{id    => zone_man_netman,
              start => {zone_man_netman, start_link, []}
+           },
+           #{id    => zone_man_master,
+             start => {zone_man_master, start_link, [FileBase]}
            }],
   {ok, {{one_for_one, 1, 5}, Procs}}.
