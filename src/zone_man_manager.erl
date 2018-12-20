@@ -54,7 +54,7 @@ start_link(Spec) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(Spec) ->
+init([Spec]) ->
   lager:info("Starting manager ~p", [Spec]),
   gen_server:cast(self(), go),
   {ok, #state{spec=Spec}}.
