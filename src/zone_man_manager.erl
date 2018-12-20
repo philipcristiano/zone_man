@@ -87,6 +87,7 @@ handle_call(_Request, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast(go, State=#state{spec=Spec}) ->
+    lager:info("Starting manager attempt to create things ~p", [Spec]),
     Name = maps:get(name, Spec),
     VNicName = Name ++ "0",
     lager:info("Starting manager attempt to create things"),

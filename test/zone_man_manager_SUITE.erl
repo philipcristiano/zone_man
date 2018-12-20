@@ -20,14 +20,10 @@ groups() -> [{test_init,
 
 init_per_testcase(_, Config) ->
     ok = lager_common_test_backend:bounce(debug),
-    ok = meck:new(zone_man_cmd, []),
-    ok = meck:new(zone_man_manager_sup, [unstick]),
-    Pid = start_mut(Config),
-    [{pid, Pid}|Config].
+    Config.
 
-start_mut(Config) ->
-    PrivDir = ?config(priv_dir, Config),
-    {ok, Pid} = ?MUT:start_link(PrivDir),
+start_mut(Spec) ->
+    {ok, Pid} = ?MUT:start_link(Spec),
     Pid.
 
 end_per_testcase(_, Config) ->
@@ -40,10 +36,6 @@ end_per_testcase(_, Config) ->
     Config.
 
 aa_simple_create(_Config) ->
-    meck:expect(zone_man_cmd, list_zones, fun() -> [] end),
-    {ok, Zones} = zone_man_master:list(),
-
-    ?assertEqual([], Zones),
     ok.
 
 wait_for_message(Msg, Timeout) ->
