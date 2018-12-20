@@ -1,18 +1,17 @@
 %%%-------------------------------------------------------------------
-%%% @author $AUTHOR
-%%% @copyright 2018 $OWNER
+%%% @author philipcristiano
+%%% @copyright 2018 philipcristiano
 %%% @doc
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
 
--module(zone_man_manager).
--compile({parse_transform, lager_transform}).
+-module(zone_man_netman).
 
 -behaviour(gen_server).
 
 %% API
--export([start_link/1]).
+-export([start_link/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -22,7 +21,9 @@
          terminate/2,
          code_change/3]).
 
--record(state, {spec}).
+-export([ensure_vnic/3]).
+
+-record(state, {}).
 
 %%%===================================================================
 %%% API
@@ -35,8 +36,11 @@
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link(Spec) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Spec], []).
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+ensure_vnic(Type, Name, Opts) ->
+    gen_server:call(?MODULE, {vnic, Type, Name, Opts}).
 
 
 %%%===================================================================
@@ -54,10 +58,9 @@ start_link(Spec) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init(Spec) ->
-  lager:info("Starting manager ~p", [Spec]),
-  gen_server:cast(self(), go),
-  {ok, #state{spec=Spec}}.
+init([]) ->
+    {ok, #state{}}.
+
 %%--------------------------------------------------------------------
 %% @private
 %% @doc
@@ -72,6 +75,10 @@ init(Spec) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call({vnic, Type, Name, Opts}, _From, State) ->
+    lager:info("Create vnic ~p", [{Type, Name, Opts}]),
+    Reply = ok,
+    {reply, Reply, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
@@ -86,11 +93,7 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast(go, State=#state{spec=Spec}) ->
-    Name = maps:get(name, Spec),
-    VNicName = Name ++ "0",
-    lager:info("Starting manager attempt to create things"),
-    zone_man_netman:ensure_vnic(default, VNicName, []),
+handle_cast(_Msg, State) ->
     {noreply, State}.
 
 %%--------------------------------------------------------------------
