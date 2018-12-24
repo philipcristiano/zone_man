@@ -22,13 +22,24 @@
          terminate/2,
          code_change/3]).
 
--export([ensure_vnic/3]).
+-export([
+  check_config/0,
+  ensure_vnic/3]).
 
 -record(state, {}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+
+
+check_config() ->
+    NicConfig = application:get_env(zone_man, nic_groups),
+    case NicConfig of
+        undefined -> throw("`nic_groups` not defined");
+        _ -> ok
+    end.
+
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -78,8 +89,11 @@ init([]) ->
 %%--------------------------------------------------------------------
 handle_call({vnic, Type, Name, Opts}, _From, State) ->
     lager:info("Create vnic ~p", [{Type, Name, Opts}]),
-    Reply = ok,
-    {reply, Reply, State};
+    {ok, NicConfig} = application:get_env(zone_man, nic_groups),
+    LinkName = proplists:get_value(Type, NicConfig),
+    LName = binary:bin_to_list(Name),
+    zone_man_cmd:create_vnic(LinkName, LName),
+    {reply, ok, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.

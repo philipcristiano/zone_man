@@ -6,6 +6,7 @@
 -export([stop/1]).
 
 start(_Type, _Args) ->
+  check_config(),
   Dispatch = cowboy_router:compile([
     {'_', [
       {"/v1/zones", zone_man_zone_handler, []}
@@ -43,3 +44,6 @@ start(_Type, _Args) ->
 
 stop(_State) ->
   ok.
+
+check_config() ->
+  zone_man_netman:check_config().
