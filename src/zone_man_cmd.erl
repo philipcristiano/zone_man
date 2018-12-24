@@ -61,6 +61,7 @@ run(CMD, Options) ->
     lager:info("Run: ~p ~p", [{CMD}, {Options}]),
     Port = open_port({spawn_executable, CMD}, [{line, 4096},
                                                eof,
+                                               exit_status,
                                                {args, Options}]),
     do_read(Port, []).
 
@@ -70,6 +71,9 @@ do_read(Port, Output) ->
             do_read(Port, [Data|Output]);
         {Port, eof} ->
             lists:reverse(Output);
+        {Port, {exit_status, Status}} ->
+            lager:info("Exit status: ~p", [Status]),
+            do_read(Port, Output);
         Any ->
             lager:info("No match fifo_client:do_read/1, ~p", [Any]),
             do_read(Port, Output)
