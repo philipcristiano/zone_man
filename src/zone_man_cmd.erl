@@ -8,7 +8,8 @@
          parse_machine_zone/1]).
 
 list_zones() ->
-    {0, MachineZones} = zone_man_cmd:run("/usr/sbin/zoneadm", ["list", "-p", "-c"]),
+    {0, MachineZones} = zone_man_cmd:run(
+        "/usr/sbin/zoneadm", ["list", "-p", "-c"]),
     Zones = parse_machine_zones(MachineZones),
     Zones.
 
