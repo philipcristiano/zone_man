@@ -16,8 +16,6 @@ groups() -> [{test_init,
              [aa_simple_create
             ]}].
 
-
-
 init_per_testcase(_, Config) ->
     ok = lager_common_test_backend:bounce(debug),
     Config.
