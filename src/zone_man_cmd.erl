@@ -8,21 +8,20 @@
          parse_machine_zone/1]).
 
 list_zones() ->
-    MachineZones = zone_man_cmd:run("/usr/sbin/zoneadm", ["list", "-p", "-c"]),
+    {0, MachineZones} = zone_man_cmd:run("/usr/sbin/zoneadm", ["list", "-p", "-c"]),
     Zones = parse_machine_zones(MachineZones),
     Zones.
 
 get_vnic(Name) when is_binary(Name) ->
     get_vnic(binary_to_list(Name));
 get_vnic(Name) when is_list(Name) ->
-    Result = zone_man_cmd:run(
+    {0, Result} = zone_man_cmd:run(
         "/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]),
     #{name => Result}.
 
 create_vnic(Link, Name) when is_list(Link) and is_list(Name) ->
     Args = ["create-vnic", "-l", Link, Name],
-    Res = zone_man_cmd:run("/usr/sbin/dladm", Args),
-    lager:info("Create vnic ~p ~p", [{Args}, {Res}]),
+    {0, _Result} = zone_man_cmd:run("/usr/sbin/dladm", Args),
     ok.
 
 parse_machine_zones(MachineZones) ->
@@ -63,18 +62,18 @@ run(CMD, Options) ->
                                                eof,
                                                exit_status,
                                                {args, Options}]),
-    do_read(Port, []).
+    do_read(Port, [], undefined).
 
-do_read(Port, Output) ->
+do_read(Port, Output, ExitCode) ->
     receive
         {Port, {data, {eol, Data}}} ->
-            do_read(Port, [Data|Output]);
+            do_read(Port, [Data|Output], ExitCode);
         {Port, eof} ->
-            lists:reverse(Output);
+            {ExitCode, lists:reverse(Output)};
         {Port, {exit_status, Status}} ->
             lager:info("Exit status: ~p", [Status]),
-            do_read(Port, Output);
+            do_read(Port, Output, Status);
         Any ->
             lager:info("No match fifo_client:do_read/1, ~p", [Any]),
-            do_read(Port, Output)
+            do_read(Port, Output, ExitCode)
   end.

@@ -31,7 +31,7 @@ end_per_testcase(_, Config) ->
 
 aa_get_vnic(_Config) ->
     Name = "dev0",
-    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]) -> Name end),
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]) -> {0, Name} end),
 
     Result = zone_man_cmd:get_vnic(Name),
     ?assertEqual(#{name => Name}, Result),
@@ -39,7 +39,7 @@ aa_get_vnic(_Config) ->
 
 ab_get_vnic_binary(_Config) ->
     Name = <<"dev0">>,
-    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]) -> "dev0" end),
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]) -> {0, "dev0"} end),
     Result = zone_man_cmd:get_vnic(Name),
 
     ?assertEqual(#{name => "dev0"}, Result),
@@ -48,7 +48,7 @@ ab_get_vnic_binary(_Config) ->
 ba_create_vnic(_Config) ->
     Link = "link0",
     Name = "dev0",
-    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["create-vnic", "-l", "link0", "dev0"]) -> ok end),
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/dladm", ["create-vnic", "-l", "link0", "dev0"]) -> {0, ok} end),
 
     Result = zone_man_cmd:create_vnic(Link, Name),
     ?assertEqual(ok, Result),
