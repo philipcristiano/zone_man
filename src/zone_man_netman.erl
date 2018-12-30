@@ -92,7 +92,12 @@ handle_call({vnic, Type, Name, Opts}, _From, State) ->
     {ok, NicConfig} = application:get_env(zone_man, nic_groups),
     LinkName = proplists:get_value(Type, NicConfig),
     LName = binary:bin_to_list(Name),
-    zone_man_cmd:create_vnic(LinkName, LName),
+
+    SystemVnic = zone_man_cmd:get_vnic(LName),
+    case SystemVnic of
+        undefined -> zone_man_cmd:create_vnic(LinkName, LName);
+        _ -> lager:debug("VNIC ~p already exists", [LName])
+    end,
     {reply, ok, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
