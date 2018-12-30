@@ -16,9 +16,16 @@ list_zones() ->
 get_vnic(Name) when is_binary(Name) ->
     get_vnic(binary_to_list(Name));
 get_vnic(Name) when is_list(Name) ->
-    {0, Result} = zone_man_cmd:run(
+    Returned = zone_man_cmd:run(
         "/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]),
-    #{name => Result}.
+
+    MissingStr = "dladm: invalid vnic name '" ++ Name ++ "': object not found",
+    lager:debug("MissingStr ~p", [MissingStr]),
+    Return = case Returned of
+        {0, Result} -> #{name => Result};
+        {1, MissingStr} -> undefined
+    end,
+    Return.
 
 create_vnic(Link, Name) when is_list(Link) and is_list(Name) ->
     Args = ["create-vnic", "-l", Link, Name],

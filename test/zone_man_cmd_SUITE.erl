@@ -15,6 +15,7 @@ groups() -> [{test_init,
              [{create_priv_dir, auto_per_tc}],
              [aa_get_vnic,
               ab_get_vnic_binary,
+              ac_get_vnic_not_defined,
               ba_create_vnic
             ]}].
 
@@ -43,6 +44,17 @@ ab_get_vnic_binary(_Config) ->
     Result = zone_man_cmd:get_vnic(Name),
 
     ?assertEqual(#{name => "dev0"}, Result),
+    ok.
+
+ac_get_vnic_not_defined(_Config) ->
+    Name = "dev0",
+    meck:expect(zone_man_cmd, run, fun(
+        "/usr/sbin/dladm", ["show-vnic", "-p", "-o", "link", "dev0"]) ->
+            {1, "dladm: invalid vnic name 'dev0': object not found"}
+    end),
+
+    Result = zone_man_cmd:get_vnic(Name),
+    ?assertEqual(undefined, Result),
     ok.
 
 ba_create_vnic(_Config) ->
