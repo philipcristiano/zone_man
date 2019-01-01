@@ -12,7 +12,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/1]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -26,7 +26,7 @@
   check_config/0,
   ensure_vnic/3]).
 
--record(state, {}).
+-record(state, {nicconfig}).
 
 %%%===================================================================
 %%% API
@@ -48,8 +48,8 @@ check_config() ->
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+start_link(NicConfig) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [NicConfig], []).
 
 ensure_vnic(Type, Name, Opts) ->
     gen_server:call(?MODULE, {vnic, Type, Name, Opts}).
@@ -70,8 +70,8 @@ ensure_vnic(Type, Name, Opts) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([]) ->
-    {ok, #state{}}.
+init([NicConfig]) ->
+    {ok, #state{nicconfig = NicConfig}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -87,9 +87,9 @@ init([]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({vnic, Type, Name, Opts}, _From, State) ->
-    lager:info("Create vnic ~p", [{Type, Name, Opts}]),
-    {ok, NicConfig} = application:get_env(zone_man, nic_groups),
+handle_call({vnic, Type, Name, Opts}, _From,
+            State = #state{nicconfig=NicConfig}) ->
+    lager:info("Ensure vnic ~p", [{Type, Name, Opts}]),
     LinkName = proplists:get_value(Type, NicConfig),
     LName = binary:bin_to_list(Name),
 

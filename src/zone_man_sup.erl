@@ -9,12 +9,14 @@ start_link() ->
 
 init([]) ->
   FileBase = application:get_env(zone_man, root, "tmp"),
+  {ok, NicConfig} = application:get_env(zone_man, nic_groups),
+
   Procs = [#{id    => zone_man_manager_sup,
              start => {zone_man_manager_sup, start_link, []},
              type  => supervisor
            },
            #{id    => zone_man_netman,
-             start => {zone_man_netman, start_link, []}
+             start => {zone_man_netman, start_link, [NicConfig]}
            },
            #{id    => zone_man_master,
              start => {zone_man_master, start_link, [FileBase]}

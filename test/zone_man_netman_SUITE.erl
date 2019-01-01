@@ -13,7 +13,8 @@ all() -> [{group, test_init}].
 
 groups() -> [{test_init,
              [{create_priv_dir, auto_per_tc}],
-             [aa_simple_ensure_vnic
+             [aa_ensure_vnic_when_doesnt_exist,
+              ab_ensure_vnic_when_exists
             ]}].
 
 
@@ -24,16 +25,41 @@ init_per_testcase(_, Config) ->
 
     Config.
 
-start_mut() ->
-    {ok, Pid} = ?MUT:start_link(),
+start_mut(NicConfig) ->
+    {ok, Pid} = ?MUT:start_link(NicConfig),
     Pid.
 
 end_per_testcase(_, Config) ->
-    meck:expect(zone_man_cmd, list_zones, fun() -> [] end),
+    meck:unload(zone_man_cmd),
     ?MUT:stop(),
     Config.
 
-aa_simple_ensure_vnic(_Config) ->
+aa_ensure_vnic_when_doesnt_exist(_Config) ->
+    Type = default,
+    LinkName = "default0",
+    Name = <<"aa_test0">>,
+    Opts = [],
+    start_mut([{Type, LinkName}]),
+
+    meck:expect(zone_man_cmd, get_vnic, fun(Name) -> undefined end),
+    meck:expect(zone_man_cmd, create_vnic, fun(LinkName, Name) -> ok end),
+
+    ok = ?MUT:ensure_vnic(Type, Name, Opts),
+
+    ok.
+
+ab_ensure_vnic_when_exists(_Config) ->
+    Type = default,
+    LinkName = "default0",
+    Name = <<"aa_test0">>,
+    Opts = [],
+    start_mut([{Type, LinkName}]),
+
+    meck:expect(zone_man_cmd, get_vnic, fun(Name) -> Name end),
+    meck:expect(zone_man_cmd, create_vnic, fun(LinkName, Name) -> throw(error) end),
+
+    ok = ?MUT:ensure_vnic(Type, Name, Opts),
+
     ok.
 
 wait_for_message(Msg, Timeout) ->
