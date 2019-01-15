@@ -18,6 +18,9 @@ init([]) ->
            #{id    => zone_man_netman,
              start => {zone_man_netman, start_link, [NicConfig]}
            },
+           #{id    => zone_man_zone_cfg,
+             start => {zone_man_zone_cfg, start_link, []}
+           },
            #{id    => zone_man_master,
              start => {zone_man_master, start_link, [FileBase]}
            }],

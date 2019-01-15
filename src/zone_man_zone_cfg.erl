@@ -1,18 +1,18 @@
 %%%-------------------------------------------------------------------
 %%% @author $AUTHOR
-%%% @copyright 2018 $OWNER
+%%% @copyright 2019 $OWNER
 %%% @doc
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
 
--module(zone_man_manager).
+-module(zone_man_zone_cfg).
 -compile({parse_transform, lager_transform}).
 
 -behaviour(gen_server).
 
 %% API
--export([start_link/1]).
+-export([start_link/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -22,11 +22,16 @@
          terminate/2,
          code_change/3]).
 
--record(state, {spec}).
+-export([configure/2]).
+
+-record(state, {}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
+configure(Name, Spec) ->
+    gen_server:call(?MODULE, {configure, Name, Spec}).
+
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -35,9 +40,8 @@
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link(Spec) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [Spec], []).
-
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -54,10 +58,9 @@ start_link(Spec) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([Spec]) ->
-  lager:info("Starting manager ~p", [Spec]),
-  gen_server:cast(self(), go),
-  {ok, #state{spec=Spec}}.
+init([]) ->
+    {ok, #state{}}.
+
 %%--------------------------------------------------------------------
 %% @private
 %% @doc
@@ -72,6 +75,10 @@ init([Spec]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
+handle_call({configure, Name, Spec}, _From, State) ->
+    lager:info("configure ~p", [{Name, Spec}]),
+    Reply = ok,
+    {reply, Reply, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
@@ -86,14 +93,7 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast(go, State=#state{spec=Spec}) ->
-    lager:info("Starting manager attempt to create things ~p", [Spec]),
-    Name = maps:get(name, Spec),
-    VNicName = <<Name/binary, <<"0">>/binary >>,
-    lager:info("Starting manager attempt to create things"),
-    zone_man_netman:ensure_vnic(default, VNicName, []),
-
-    zone_man_zone_cfg:configure(Name, Spec),
+handle_cast(_Msg, State) ->
     {noreply, State}.
 
 %%--------------------------------------------------------------------
