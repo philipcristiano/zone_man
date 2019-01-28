@@ -24,6 +24,6 @@ stages:
       - make ips-package
 
   - name: publish
-    match: "^master$"
+    match: "^create-zone$"
     steps:
       - make publish
