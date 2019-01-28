@@ -26,7 +26,9 @@ PKGSRVR=YOUR_IPS_REPO PATH=/opt/omni/bin/:/usr/gnu/bin:$PATH make package publis
 Example:
 
 ```
-[{zone_man, [{certificates_directory, "/var/lib/zone_man/certificates"}]}].
+[{zone_man, [{certificates_directory, "/var/lib/zone_man/certificates"},
+             {nic_groups, [{default, "e1000g0"}]}
+]}].
 ```
 
 # API

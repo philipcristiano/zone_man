@@ -26,7 +26,7 @@
 
 
         <method_context>
-            <method_credential user='zone_man' group='zone_man' privileges='basic,PRIV_NET_PRIVADDR'/>
+            <method_credential user='zone_man' group='zone_man' privileges='basic,PRIV_NET_PRIVADDR,sys_dl_config'/>
             <method_environment>
                 <envvar name="HOME" value="/opt/zone_man"/>
             </method_environment>

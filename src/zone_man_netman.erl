@@ -1,12 +1,12 @@
 %%%-------------------------------------------------------------------
 %%% @author philipcristiano
-%%% @copyright 2018 $OWNER
+%%% @copyright 2018 philipcristiano
 %%% @doc
 %%%
 %%% @end
 %%%-------------------------------------------------------------------
 
--module(zone_man_master).
+-module(zone_man_netman).
 -compile({parse_transform, lager_transform}).
 
 -behaviour(gen_server).
@@ -22,27 +22,24 @@
          terminate/2,
          code_change/3]).
 
--export([list/0,
-         stop/0,
-         create/1]).
+-export([
+  check_config/0,
+  ensure_vnic/3]).
 
--record(state, {}).
-
--define(TABLE, zone_registry).
--record(zone_record, {name, spec, desired_state}).
+-record(state, {nicconfig}).
 
 %%%===================================================================
 %%% API
 %%%===================================================================
 
-list() ->
-    gen_server:call(?MODULE, {list}).
 
-stop() ->
-    gen_server:stop(?MODULE).
+check_config() ->
+    NicConfig = application:get_env(zone_man, nic_groups),
+    case NicConfig of
+        undefined -> throw("`nic_groups` not defined");
+        _ -> ok
+    end.
 
-create(Name) when is_binary(Name) ->
-    gen_server:call(?MODULE, {create, Name}).
 
 %%--------------------------------------------------------------------
 %% @doc
@@ -51,8 +48,12 @@ create(Name) when is_binary(Name) ->
 %% @spec start_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-start_link(FileBase) ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [FileBase], []).
+start_link(NicConfig) ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [NicConfig], []).
+
+ensure_vnic(Type, Name, Opts) ->
+    gen_server:call(?MODULE, {vnic, Type, Name, Opts}).
+
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -69,15 +70,8 @@ start_link(FileBase) ->
 %%                     {stop, Reason}
 %% @end
 %%--------------------------------------------------------------------
-init([FileBase]) ->
-    Filename = filename:join([FileBase, "dets", "zone_registry"]),
-    ok = lager:info("Zone registry file ~p", [Filename]),
-    ok = filelib:ensure_dir(Filename),
-    {ok, _Name} = dets:open_file(?TABLE, [{type, set},
-                                          {keypos, #zone_record.name},
-                                          {file, Filename}]),
-    ok = gen_server:cast(?MODULE, {start_all}),
-    {ok, #state{}}.
+init([NicConfig]) ->
+    {ok, #state{nicconfig = NicConfig}}.
 
 %%--------------------------------------------------------------------
 %% @private
@@ -93,16 +87,18 @@ init([FileBase]) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_call({list}, _From, State) ->
-    % Zones = zone_man_cmd:list_zones(),
-    Zones = all_zone_names(),
-    {reply, {ok, Zones}, State};
-handle_call({create, Name}, _From, State) ->
-    Spec = #{name => Name},
-    Record =  #zone_record{name = Name, spec=#{}, desired_state=running},
-    ok = dets:insert(?TABLE, Record),
-    {ok, _Child} = zone_man_manager_sup:start(Spec),
-    {reply, {ok}, State};
+handle_call({vnic, Type, Name, Opts}, _From,
+            State = #state{nicconfig=NicConfig}) ->
+    lager:info("Ensure vnic ~p", [{Type, Name, Opts}]),
+    LinkName = proplists:get_value(Type, NicConfig),
+    LName = binary:bin_to_list(Name),
+
+    SystemVnic = zone_man_cmd:get_vnic(LName),
+    case SystemVnic of
+        undefined -> zone_man_cmd:create_vnic(LinkName, LName);
+        _ -> lager:debug("VNIC ~p already exists", [LName])
+    end,
+    {reply, ok, State};
 handle_call(_Request, _From, State) ->
     Reply = ok,
     {reply, Reply, State}.
@@ -117,9 +113,6 @@ handle_call(_Request, _From, State) ->
 %%                                  {stop, Reason, State}
 %% @end
 %%--------------------------------------------------------------------
-handle_cast({start_all}, State) ->
-    ok = start_all(),
-    {noreply, State};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
@@ -164,29 +157,3 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-
-all_zone_names() ->
-    Key = dets:first(?TABLE),
-    all_zone_names(Key, []).
-
-all_zone_names('$end_of_table', L) ->
-    L;
-all_zone_names(Key, L) ->
-    lager:info("test: ~p", [Key]),
-    NewL = [Key] ++ L,
-    Next = dets:next(?TABLE, Key),
-    all_zone_names(Next, NewL).
-
-start_all() ->
-    Key = dets:first(?TABLE),
-    start_all(Key).
-
-start_all('$end_of_table') ->
-    ok;
-start_all(Key) ->
-    lager:info("test: ~p", [Key]),
-    Spec = #{name => Key},
-    {ok, _Child} = zone_man_manager_sup:start(Spec),
-
-    Next = dets:next(?TABLE, Key),
-    start_all(Next).

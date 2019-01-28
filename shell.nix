@@ -8,5 +8,7 @@ let
 in stdenv.mkDerivation {
   name = "env";
   buildInputs = [ ghpkgs.cfssl
+                  pkgs.gnumake
+                  pkgs.erlangR20
                 ];
 }
