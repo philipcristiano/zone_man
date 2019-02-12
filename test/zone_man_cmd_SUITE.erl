@@ -16,7 +16,9 @@ groups() -> [{test_init,
              [aa_get_vnic,
               ab_get_vnic_binary,
               ac_get_vnic_not_defined,
-              ba_create_vnic
+              ba_create_vnic,
+              ca_get_zone_cfg_no_zone,
+              cb_get_zone_cfg_no_zone_binary
             ]}].
 
 
@@ -66,9 +68,36 @@ ba_create_vnic(_Config) ->
     ?assertEqual(ok, Result),
     ok.
 
+ca_get_zone_cfg_no_zone(_Config) ->
+    Name = "dev",
+
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/zonecfg", ["-z", _, "info"]) -> {1, "dev: No such zone configured"} end),
+
+    Result = zone_man_cmd:get_zone_cfg(Name),
+    ?assertEqual(undefined, Result),
+    ok.
+
+cb_get_zone_cfg_no_zone_binary(_Config) ->
+    Name = <<"dev">>,
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/zonecfg", ["-z", _, "info"]) -> {1, "dev: No such zone configured"} end),
+    Result = zone_man_cmd:get_zone_cfg(Name),
+
+    ?assertEqual(undefined, Result),
+    ok.
+
 wait_for_message(Msg, Timeout) ->
     ok = receive
       Msg -> ok
     after
       Timeout -> error
     end.
+
+parsed_zone_info() ->
+  [{<<"zonename">>, <<"dev">>},
+   {<<"zonepath">>, <<"/zones/dev">>},
+   {<<"brand">>, <<"ipkg">>},
+   {<<"autoboot">>, <<"true">>},
+   {<<"ip-type">>, <<"exclusive">>},
+   {<<"net">>, [{<<"physical">>, <<"dev0">>}]},
+   {<<"net">>, [{<<"physical">>, <<"dev1">>}]}
+  ].

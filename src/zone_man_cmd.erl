@@ -4,6 +4,8 @@
 -export([run/2,
          get_vnic/1,
          create_vnic/2,
+         get_zone_cfg/1,
+         configure_zone/2,
          list_zones/0,
          parse_machine_zone/1]).
 
@@ -31,6 +33,24 @@ create_vnic(Link, Name) when is_list(Link) and is_list(Name) ->
     Args = ["create-vnic", "-l", Link, Name],
     {0, _Result} = zone_man_cmd:run("/usr/sbin/dladm", Args),
     ok.
+
+get_zone_cfg(Name) when is_binary(Name) ->
+    get_zone_cfg(binary_to_list(Name));
+get_zone_cfg(Name) when is_list(Name) ->
+    Name,
+
+    Returned = zone_man_cmd:run("/usr/sbin/zonecfg", ["-z", Name, "info"]),
+    MissingStr = Name ++ ": No such zone configured",
+
+    Return = case Returned of
+        {1, MissingStr} -> undefined;
+        _ -> ok
+    end,
+
+    Return.
+
+configure_zone(Name, Opts) ->
+    {Name, Opts}.
 
 parse_machine_zones(MachineZones) ->
     parse_machine_zones(MachineZones, []).

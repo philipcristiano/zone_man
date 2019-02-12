@@ -12,7 +12,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, stop/0]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -42,6 +42,9 @@ configure(Name, Spec) ->
 %%--------------------------------------------------------------------
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+stop() ->
+    gen_server:stop({local, ?MODULE}).
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -77,6 +80,24 @@ init([]) ->
 %%--------------------------------------------------------------------
 handle_call({configure, Name, Spec}, _From, State) ->
     lager:info("configure ~p", [{Name, Spec}]),
+
+    Cfg = zone_man_cmd:get_zone_cfg(Name),
+
+    VNicName = <<Name/binary, <<"0">>/binary >>,
+
+    Opts = [{brand, sparse},
+            {"ip-type", exclusive},
+            {net, [
+                {physical, VNicName}
+            ]}
+           ],
+
+    case Cfg of
+        undefined -> zone_man_cmd:configure_zone(Name, Opts);
+        _ -> lager:debug("Zone already configured ~p", [Cfg])
+    end,
+
+
     Reply = ok,
     {reply, Reply, State};
 handle_call(_Request, _From, State) ->
