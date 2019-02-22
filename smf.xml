@@ -29,6 +29,7 @@
             <method_credential user='zone_man' group='zone_man' privileges='basic,PRIV_NET_PRIVADDR,sys_dl_config'/>
             <method_environment>
                 <envvar name="HOME" value="/opt/zone_man"/>
+                <envvar name="PATH" value="/usr/gnu/bin:/usr/sbin:/sbin:/usr/bin"/>
             </method_environment>
         </method_context>
 

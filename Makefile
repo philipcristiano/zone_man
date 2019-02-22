@@ -26,6 +26,8 @@ BUILD_TIME=$(shell TZ=UTC date +"%Y%m%dT%H%M%SZ")
 export IPS_FMRI=server/${PROJECT}@${PROJECT_VERSION}:${BUILD_TIME}
 export IPS_DESCRIPTION=${PROJECT_DESCRIPTION}
 export IPS_SUMMARAY=${IPS_DESCRIPTION}
+IPS_DEPS = pkg:/text/gawk
+
 #PKG_VERSION	?= $(shell git describe --tags | tr - .)
 ARCH=$(shell uname -p)
 
