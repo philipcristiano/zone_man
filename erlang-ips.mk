@@ -26,6 +26,7 @@ ips-prototype: rel
 	mkdir -p ${IPS_BUILD_DIR}/opt/ ${IPS_TMP_DIR} "${IPS_BUILD_DIR}/etc"
 	cp -R _rel/${PROJECT}_release ${IPS_BUILD_DIR}/opt/${PROJECT}
 	rm -rf ${IPS_BUILD_DIR}/opt/${PROJECT}/${PROJECT}_release-*.tar.gz
+	rm -rf ${IPS_BUILD_DIR}/opt/${PROJECT}/${PROJECT}_release/${PROJECT}_release-*.tar.gz
 
 	cp LICENSE ${IPS_BUILD_DIR}/
 
