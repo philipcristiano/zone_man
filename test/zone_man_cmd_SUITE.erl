@@ -18,7 +18,8 @@ groups() -> [{test_init,
               ac_get_vnic_not_defined,
               ba_create_vnic,
               ca_get_zone_cfg_no_zone,
-              cb_get_zone_cfg_no_zone_binary
+              cb_get_zone_cfg_no_zone_binary,
+              da_configure_zone
             ]}].
 
 
@@ -83,6 +84,15 @@ cb_get_zone_cfg_no_zone_binary(_Config) ->
     Result = zone_man_cmd:get_zone_cfg(Name),
 
     ?assertEqual(undefined, Result),
+    ok.
+
+da_configure_zone(_Config) ->
+    Name = "dev",
+
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/zonecfg", ["-z", _, "create; commit"]) -> {0, ""} end),
+
+    Result = zone_man_cmd:configure_zone(Name, []),
+    ?assertEqual(ok, Result),
     ok.
 
 wait_for_message(Msg, Timeout) ->

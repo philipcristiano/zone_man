@@ -49,8 +49,12 @@ get_zone_cfg(Name) when is_list(Name) ->
 
     Return.
 
-configure_zone(Name, Opts) ->
-    {Name, Opts}.
+configure_zone(Name, []) ->
+    Returned = zone_man_cmd:run("/usr/sbin/zonecfg", ["-z", Name, "create; commit"]),
+    Return = case Returned of
+        _ -> ok
+    end,
+    Return.
 
 parse_machine_zones(MachineZones) ->
     parse_machine_zones(MachineZones, []).
