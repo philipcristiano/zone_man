@@ -5,7 +5,7 @@
          get_vnic/1,
          create_vnic/2,
          get_zone_cfg/1,
-         configure_zone/2,
+         configure_zone/3,
          list_zones/0,
          parse_machine_zone/1]).
 
@@ -49,8 +49,12 @@ get_zone_cfg(Name) when is_list(Name) ->
 
     Return.
 
-configure_zone(Name, []) ->
-    Returned = zone_man_cmd:run("/usr/sbin/zonecfg", ["-z", Name, "create; commit"]),
+configure_zone(Name, ZonePath, []) ->
+    Args0 = ["create;", " zonepath=", ZonePath, ";"],
+    Args1 = Args0 ++ [" commit"],
+    ArgString = lists:flatten(Args1),
+
+    Returned = zone_man_cmd:run("/usr/sbin/zonecfg", ["-z", Name, ArgString]),
     Return = case Returned of
         _ -> ok
     end,

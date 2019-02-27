@@ -88,10 +88,11 @@ cb_get_zone_cfg_no_zone_binary(_Config) ->
 
 da_configure_zone(_Config) ->
     Name = "dev",
+    ZonePath = "/zones/dev",
 
-    meck:expect(zone_man_cmd, run, fun("/usr/sbin/zonecfg", ["-z", _, "create; commit"]) -> {0, ""} end),
+    meck:expect(zone_man_cmd, run, fun("/usr/sbin/zonecfg", ["-z", _, "create; zonepath=/zones/dev; commit"]) -> {0, ""} end),
 
-    Result = zone_man_cmd:configure_zone(Name, []),
+    Result = zone_man_cmd:configure_zone(Name, ZonePath, []),
     ?assertEqual(ok, Result),
     ok.
 

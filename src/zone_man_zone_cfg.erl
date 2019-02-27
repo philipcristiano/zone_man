@@ -80,10 +80,12 @@ init([]) ->
 %%--------------------------------------------------------------------
 handle_call({configure, Name, Spec}, _From, State) ->
     lager:info("configure ~p", [{Name, Spec}]),
+    LName = binary:to_list(Name),
 
     Cfg = zone_man_cmd:get_zone_cfg(Name),
 
     VNicName = <<Name/binary, <<"0">>/binary >>,
+    ZonePath = "/zones/" ++ LName,
 
     Opts = [{brand, sparse},
             {"ip-type", exclusive},
@@ -93,7 +95,7 @@ handle_call({configure, Name, Spec}, _From, State) ->
            ],
 
     case Cfg of
-        undefined -> zone_man_cmd:configure_zone(Name, Opts);
+        undefined -> zone_man_cmd:configure_zone(Name, ZonePath, Opts);
         _ -> lager:debug("Zone already configured ~p", [Cfg])
     end,
 
