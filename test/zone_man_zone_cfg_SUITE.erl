@@ -38,7 +38,7 @@ aa_ensure_zone_when_doesnt_exist(_Config) ->
     Spec = #{},
 
     meck:expect(zone_man_cmd, get_zone_cfg, fun(_Name) -> undefined end),
-    meck:expect(zone_man_cmd, configure_zone, fun(_Name, _Opts) -> ok end),
+    meck:expect(zone_man_cmd, configure_zone, fun(_Name, _ZonePath, _Opts) -> ok end),
 
     ok = ?MUT:configure(Name, Spec).
 

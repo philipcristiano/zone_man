@@ -80,7 +80,7 @@ init([]) ->
 %%--------------------------------------------------------------------
 handle_call({configure, Name, Spec}, _From, State) ->
     lager:info("configure ~p", [{Name, Spec}]),
-    LName = binary:to_list(Name),
+    LName = binary_to_list(Name),
 
     Cfg = zone_man_cmd:get_zone_cfg(Name),
 
