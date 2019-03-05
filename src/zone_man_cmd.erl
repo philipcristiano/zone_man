@@ -41,6 +41,7 @@ get_zone_cfg(Name) when is_list(Name) ->
 
     Returned = zone_man_cmd:run("/usr/sbin/zonecfg", ["-z", Name, "info"]),
     MissingStr = Name ++ ": No such zone configured",
+    lager:info("zonecfg returned: ~p", [Returned]),
 
     Return = case Returned of
         {1, MissingStr} -> undefined;
